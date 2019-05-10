@@ -1,0 +1,15 @@
+*~
+*.o
+firmware/build/*.d
+*.lst
+**/cscope.files
+**/cscope.in.out
+**/cscope.out
+**/cscope.po.out
+**/build_cscope.sh
+/firmware/run_make.sh
+/firmware/GPATH
+/firmware/GTAGS
+/firmware/GRTAGS
+/firmware/NppGTags.cfg
+/firmware/keil_debug/**
