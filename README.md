@@ -14,8 +14,8 @@ $ git clone https://github.com/rkprojects/openlink-v1-cmsis-dap.git
 
 * 55x30 mm board size.
 * Low cost, Low pin count MCU STM32F070F6P6.
-* Micro USB connector.
-* 10-pin cortex debug connector.
+* Micro USB type B connector.
+* 10-pin cortex debug connector
 * All GPIOs on Headers.
 
 ## Design Files and Gerber
@@ -31,9 +31,10 @@ Schematic and PCB Layout designed with [DipTrace Version 3.3.1.3 (Freeware)](htt
 Before sending gerber files to fabrication please cross check the design rules 
 with your PCB manufacturer's specifications and rerun DRC.
 
-Current DRC violations waved off:
+Current DRC violations waved off:  
+
 * J3.1 and J3.5 Drill to SMD pad clearance is set to 12 mil as per my PCB manufacturer's specifications however 
-in manufacturer's review it was waved off.
+in manufacturer's review it was waved off.  
 * Y1.1 and Y1.2: Footprint design of Y1 (crystal) is a hybrid one (through hole pad overlapping SMD pad) 
 with possibility of mounting either SMD or through hole crystal. Preferred part is SMD, however 
 if you wish to use through hole part then while soldering raise the height of crystal such that 
@@ -74,15 +75,6 @@ to toolchain binaries and run make.
 * Reset the board with **Reset** switch. There is no need to power cycle the board.
 * Board should now get detected as USB HID device, cross check this in Device manager.
 
-## Pending Stuff
-
-* JTAG interface of the debug unit is not yet tested as 
-all the Cortex-M boards I have are designed with SWD debug port. 
-However JTAG interface is completely implemented in firmware.
-* SWO Trace capture is not yet implemented.
-* **USB VID/PID** not yet assigned. Currently the assigned [test vid/pid: 1209/0001](http://pid.codes) 
-can be used only for private testing.
-
 ## Validate Debug Unit
 
 * CMSIS DAP Firmware Validation project is in 
@@ -91,6 +83,18 @@ folder *openlink-v1-cmsis-dap/firmware/Validation/MDK5*.
 * In the step where CMSIS-DAP debugger needs to be selected, select **OpenLink-V1 CMSIS-DAP**.
 * For specific example with LPC4357 MCU based target 
 board refer to [project home page](https://ravikiranb.com/projects/cmsis-dap-debug/).
+
+# Pending Stuff
+
+* JTAG interface of the debug unit is not yet tested as 
+all the Cortex-M boards I have are designed with SWD debug port. 
+However JTAG interface is completely implemented in firmware.
+* SWO Trace capture is not yet implemented.
+* Currently a test USB VID/PID: [1209/0001](http://pid.codes) is assigned which is meant
+for only private testing. Unique USB VID/PID assignment is pending.
+* Current 10-pin debug connector (J4) is of through hole type with 1.27mm pitch. Commonly
+used connectors are of SMD type compatible with samtec FTSH-105- styles.
+
 
 # License
 
