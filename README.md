@@ -105,8 +105,14 @@ This project uses multiple licenses:
 * ![Creative Commons License](https://i.creativecommons.org/l/by-sa/4.0/88x31.png)  
 **Schematic and PCB Layout** design files are licensed under a 
 [Creative Commons Attribution-ShareAlike 4.0 International License](http://creativecommons.org/licenses/by-sa/4.0/)
-* **CMSIS DAP firmware code** is licensed under [Apache License, Version 2.0](www.apache.org/licenses/LICENSE-2.0)
+* **CMSIS DAP firmware code** is licensed under [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0)
 * **STMicroelectronics supplied USB Middleware, HAL, LL drivers and startup source codes** are licensed 
-under [Ultimate Liberty license SLA0044](www.st.com/SLA0044)
-* **Code to bridge USB and DAP data flow** is licensed under [Apache License, Version 2.0](www.apache.org/licenses/LICENSE-2.0)
+under [Ultimate Liberty license SLA0044](http://www.st.com/SLA0044)
+* **Code to bridge USB and DAP data flow** is licensed under [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0)
 * Each source/header file specifies corresponding license/copyright notices.
+
+
+All firmware source codes and hardware design files in this project are distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
