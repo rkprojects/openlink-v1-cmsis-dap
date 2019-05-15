@@ -23,7 +23,7 @@ limitations under the License.
 #include "cmsis_compiler.h"
 #include "usbd_custom_hid_if.h"
 
-UART_HandleTypeDef huart2;
+
 
 extern USBD_HandleTypeDef hUsbDeviceFS;
 uint8_t  USB_DAP_Requests [DAP_PACKET_COUNT][DAP_PACKET_SIZE];  
@@ -37,7 +37,6 @@ volatile uint32_t RequestPendingCount;
 
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
-static void MX_USART2_UART_Init(void);
 
 int main(void)
 {
@@ -54,10 +53,7 @@ int main(void)
 	
 	MX_GPIO_Init();
 	
-	// SWO trace not implemented
-	//MX_USART2_UART_Init();
-	
-  MX_USB_DEVICE_Init();
+	MX_USB_DEVICE_Init();
 	
   DAP_Setup();
   
@@ -150,25 +146,6 @@ void SystemClock_Config(void)
   HAL_RCC_EnableCSS();
 }
 
-#if 0
-static void MX_USART2_UART_Init(void)
-{
-  huart2.Instance = USART2;
-  huart2.Init.BaudRate = 38400;
-  huart2.Init.WordLength = UART_WORDLENGTH_8B;
-  huart2.Init.StopBits = UART_STOPBITS_1;
-  huart2.Init.Parity = UART_PARITY_NONE;
-  huart2.Init.Mode = UART_MODE_TX_RX;
-  huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-  huart2.Init.OverSampling = UART_OVERSAMPLING_16;
-  huart2.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
-  huart2.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
-  if (HAL_UART_Init(&huart2) != HAL_OK)
-  {
-    Error_Handler();
-  }
-}
-#endif
 
 static void MX_GPIO_Init(void)
 {

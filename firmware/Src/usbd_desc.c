@@ -84,7 +84,7 @@
 #define USBD_CONFIGURATION_STRING_FS  "Custom HID Config"
 #define USBD_INTERFACE_STRING_FS      "Custom HID Interface"
 
-#define OPENLINK_CMSIS_DAP_VERSION		0x0100 //0xMMnn, MM = Major version number, nn = minor version number
+#define OPENLINK_CMSIS_DAP_VERSION		0x0101 //0xMMnn, MM = Major version number, nn = minor version number
 /* USER CODE BEGIN PRIVATE_DEFINES */
 
 /* USER CODE END PRIVATE_DEFINES */

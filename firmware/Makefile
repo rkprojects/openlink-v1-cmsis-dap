@@ -33,6 +33,7 @@ Src/usbd_desc.c \
 Src/usbd_custom_hid_if.c \
 Src/stm32f0xx_it.c \
 Src/stm32f0xx_hal_msp.c \
+Src/CMSIS_Driver_USART.c \
 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pcd.c \
 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pcd_ex.c \
 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim.c \
@@ -59,7 +60,8 @@ Middlewares/ST/STM32_USB_Device_Library/Class/CustomHID/Src/usbd_customhid.c \
 Drivers/CMSIS/DAP/Firmware/Source/DAP.c \
 Drivers/CMSIS/DAP/Firmware/Source/DAP_vendor.c \
 Drivers/CMSIS/DAP/Firmware/Source/JTAG_DP.c \
-Drivers/CMSIS/DAP/Firmware/Source/SW_DP.c 
+Drivers/CMSIS/DAP/Firmware/Source/SW_DP.c \
+Drivers/CMSIS/DAP/Firmware/Source/SWO.c
 
 # ASM sources
 ASM_SOURCES =  \
@@ -109,8 +111,8 @@ AS_DEFS =
 C_DEFS =  \
 -DUSE_HAL_DRIVER \
 -DSTM32F070x6 \
--DDAP_FW_V1
-
+-DDAP_FW_V1 \
+-DUSART_PORT=2
 
 # AS includes
 AS_INCLUDES = 
@@ -125,7 +127,8 @@ C_INCLUDES =  \
 -IDrivers/CMSIS/Device/ST/STM32F0xx/Include \
 -IDrivers/CMSIS/Include \
 -IDrivers/CMSIS/Include \
--IDrivers/CMSIS/DAP/Firmware/Include
+-IDrivers/CMSIS/DAP/Firmware/Include \
+-IDrivers/CMSIS/Driver/Include
 
 
 # compile gcc flags
