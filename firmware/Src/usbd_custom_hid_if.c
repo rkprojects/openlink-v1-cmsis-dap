@@ -152,6 +152,7 @@ extern uint8_t  USB_DAP_Requests [DAP_PACKET_COUNT][DAP_PACKET_SIZE];
 extern volatile uint32_t RequestPendingCount;
 
 static volatile uint32_t RequestIndexPending;
+volatile uint32_t RequestPauseProcessing;
 
 /** @defgroup USBD_CUSTOM_HID_Private_FunctionPrototypes USBD_CUSTOM_HID_Private_FunctionPrototypes
   * @brief Private functions declaration.
@@ -189,6 +190,7 @@ static int8_t CUSTOM_HID_Init_FS(void)
 {
   /* USER CODE BEGIN 4 */
 	RequestIndexPending = 0;
+	RequestPauseProcessing = 0;
 	
   return (USBD_OK);
   /* USER CODE END 4 */
@@ -218,6 +220,7 @@ static int8_t CUSTOM_HID_OutEvent_FS(uint8_t event_idx, uint8_t state)
 	
 	if (hhid->Report_buf[0] == ID_DAP_TransferAbort) {
     DAP_TransferAbort = 1U;
+		RequestPauseProcessing = 0;
   }
 	else {
 		if (RequestPendingCount < DAP_PACKET_COUNT) {
@@ -226,7 +229,18 @@ static int8_t CUSTOM_HID_OutEvent_FS(uint8_t event_idx, uint8_t state)
 			if (RequestIndexPending >= DAP_PACKET_COUNT) {
 				RequestIndexPending = 0;
 			}
+			
+			if (hhid->Report_buf[0] == ID_DAP_QueueCommands)
+				RequestPauseProcessing = 1;
+			else
+				RequestPauseProcessing = 0;
+			
 			RequestPendingCount++;
+		}
+		else if (RequestPauseProcessing) {
+			// This will cause deadlock. Host is not honoring packet count limits.
+			// Release pause.
+			RequestPauseProcessing = 0;
 		}
 	}
 	

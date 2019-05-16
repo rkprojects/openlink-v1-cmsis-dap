@@ -29,19 +29,21 @@ extern USBD_HandleTypeDef hUsbDeviceFS;
 uint8_t  USB_DAP_Requests [DAP_PACKET_COUNT][DAP_PACKET_SIZE];  
 uint8_t  USB_DAP_Responses[DAP_PACKET_COUNT][DAP_PACKET_SIZE];
 
-static volatile uint32_t CommonIndex;  //Current "Request - Response" being processed index linked together.
-static volatile uint32_t ResponseIndexSend;
-static volatile uint32_t ResponsePendingCount;
+static uint32_t CommonIndex;  //Current "Request - Response" being processed index linked together.
+static uint32_t ResponseIndexSend;
+static uint32_t ResponsePendingCount;
 
 volatile uint32_t RequestPendingCount;
+extern volatile uint32_t RequestPauseProcessing;
 
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+static void Send_USB_DAP_Response(void);
 
 int main(void)
 {
-  USBD_CUSTOM_HID_HandleTypeDef *hhid;
-  
+  uint32_t skip_sending_response;
+	
 	HAL_Init();
 
   SystemClock_Config();
@@ -57,10 +59,10 @@ int main(void)
 	
   DAP_Setup();
   
-  while (1) 
+	while (1) 
 	{
     /* 
-			Cortex-M0 does not support synchronizing intstructions.
+			Cortex-M0 does not support synchronizing instructions.
 			RequestPendingCount variable has a potential racing condition.
 			Disabling interrupts while update is a choice.
 			Systick interrupt will cause wakeup in case of out of sync between
@@ -73,10 +75,19 @@ int main(void)
 		
 		while ((RequestPendingCount > 0) && (ResponsePendingCount < DAP_PACKET_COUNT)) {
 			
-			// Handle Queue Commands??
-      if (USB_DAP_Requests[CommonIndex][0] == ID_DAP_QueueCommands) {
+			if (USB_DAP_Requests[CommonIndex][0] == ID_DAP_QueueCommands) {
+				// Pause request processing until all queue commands are received.
+				if (RequestPauseProcessing)
+					break;
+				
 				USB_DAP_Requests[CommonIndex][0] = ID_DAP_ExecuteCommands;
-      }
+				
+				// Avoid sending usb response during processing queued commands.
+				skip_sending_response = 1;
+			}
+			else {
+				skip_sending_response = 0;
+			}
 			
 			DAP_ExecuteCommand(USB_DAP_Requests[CommonIndex], USB_DAP_Responses[CommonIndex]);
 			
@@ -86,21 +97,28 @@ int main(void)
 			if (CommonIndex >= DAP_PACKET_COUNT) {
 				CommonIndex = 0;
 			}
+			
+			if (skip_sending_response == 0)
+				Send_USB_DAP_Response();
 		}
 		
-		while (ResponsePendingCount > 0) {
-			
-			hhid = (USBD_CUSTOM_HID_HandleTypeDef*) hUsbDeviceFS.pClassData;
-			
-			if (hhid->state == CUSTOM_HID_IDLE) {
-				USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS, USB_DAP_Responses[ResponseIndexSend], DAP_PACKET_SIZE);
-				ResponseIndexSend++;
-				if (ResponseIndexSend >= DAP_PACKET_COUNT) {
-					ResponseIndexSend = 0;
-				}
-				ResponsePendingCount--;
-			}
+		if (ResponsePendingCount > 0) {
+			Send_USB_DAP_Response();
 		}
+	}
+}
+
+static void Send_USB_DAP_Response(void) {
+	
+	USBD_CUSTOM_HID_HandleTypeDef *hhid = (USBD_CUSTOM_HID_HandleTypeDef*) hUsbDeviceFS.pClassData;
+			
+	if (hhid->state == CUSTOM_HID_IDLE) {
+		USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS, USB_DAP_Responses[ResponseIndexSend], DAP_PACKET_SIZE);
+		ResponseIndexSend++;
+		if (ResponseIndexSend >= DAP_PACKET_COUNT) {
+			ResponseIndexSend = 0;
+		}
+		ResponsePendingCount--;
 	}
 }
 
