@@ -136,7 +136,7 @@ This information includes:
 #define SWO_STREAM              0               ///< SWO Streaming Trace: 1 = available, 0 = not available.
 
 /// Clock frequency of the Test Domain Timer. Timer value is returned with \ref TIMESTAMP_GET.
-#define TIMESTAMP_CLOCK         0U      ///< Timestamp clock in Hz (0 = timestamps not supported).
+#define TIMESTAMP_CLOCK         1000000U      ///< Timestamp clock in Hz (0 = timestamps not supported).
 
 /// Debug Unit is connected to fixed Target Device.
 /// The Debug Unit may be part of an evaluation board and always connected to a fixed
@@ -531,7 +531,11 @@ default, the DWT timer is used.  The frequency of this timer is configured with 
 \return Current timestamp value.
 */
 __STATIC_INLINE uint32_t TIMESTAMP_GET (void) {
-  return 0;
+  uint32_t ts;
+	
+	ts = TIM3->CNT;
+	ts = (ts << 16) | TIM1->CNT;
+	return ts;
 }
 
 ///@}
