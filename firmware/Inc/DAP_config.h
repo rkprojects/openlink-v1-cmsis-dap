@@ -46,14 +46,26 @@
 
 
 // All JTAG/SWD pins are on Port A.
-#define GPIO_PIN_nRESET     GPIO_PIN_5
-#define GPIO_PIN_SWDIO_TMS  GPIO_PIN_2
-#define GPIO_PIN_SWDCLK_TCK GPIO_PIN_4
+#define GPIO_PIN_nRESET     		GPIO_PIN_5
+#define GPIO_PIN_nRESET_BIT 		5
+
+#define GPIO_PIN_SWDIO_TMS  		GPIO_PIN_2
+#define GPIO_PIN_SWDIO_TMS_BIT 	2
+
+#define GPIO_PIN_SWDCLK_TCK 		GPIO_PIN_4
+#define GPIO_PIN_SWDCLK_TCK_BIT 4
+
 #define GPIO_PIN_TDI        GPIO_PIN_6
+#define GPIO_PIN_TDI_BIT    6
+
 #define GPIO_PIN_TDO        GPIO_PIN_3
+#define GPIO_PIN_TDO_BIT    3
 
 #define GPIO_PIN_LED_RUN      GPIO_PIN_0
-#define GPIO_PIN_LED_CONNECT  GPIO_PIN_1
+#define GPIO_PIN_LED_RUN_BIT  0
+
+#define GPIO_PIN_LED_CONNECT  		GPIO_PIN_1
+#define GPIO_PIN_LED_CONNECT_BIT  1
 
 //**************************************************************************************************
 /** 
@@ -331,21 +343,24 @@ __STATIC_INLINE void PORT_OFF (void) {
 \return Current status of the SWCLK/TCK DAP hardware I/O pin.
 */
 __STATIC_FORCEINLINE uint32_t PIN_SWCLK_TCK_IN  (void) {
-  return HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_SWDCLK_TCK);
+  //return HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_SWDCLK_TCK);
+	return (GPIOA->IDR & GPIO_PIN_SWDCLK_TCK) >> GPIO_PIN_SWDCLK_TCK_BIT; 
 }
 
 /** SWCLK/TCK I/O pin: Set Output to High.
 Set the SWCLK/TCK DAP hardware I/O pin to high level.
 */
 __STATIC_FORCEINLINE void     PIN_SWCLK_TCK_SET (void) {
-  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_SWDCLK_TCK, GPIO_PIN_SET);
+  //HAL_GPIO_WritePin(GPIOA, GPIO_PIN_SWDCLK_TCK, GPIO_PIN_SET);
+	GPIOA->BSRR = (uint32_t)GPIO_PIN_SWDCLK_TCK;
 }
 
 /** SWCLK/TCK I/O pin: Set Output to Low.
 Set the SWCLK/TCK DAP hardware I/O pin to low level.
 */
 __STATIC_FORCEINLINE void     PIN_SWCLK_TCK_CLR (void) {
-  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_SWDCLK_TCK, GPIO_PIN_RESET);
+  //HAL_GPIO_WritePin(GPIOA, GPIO_PIN_SWDCLK_TCK, GPIO_PIN_RESET);
+	GPIOA->BRR = (uint32_t)GPIO_PIN_SWDCLK_TCK;
 }
 
 
@@ -355,35 +370,40 @@ __STATIC_FORCEINLINE void     PIN_SWCLK_TCK_CLR (void) {
 \return Current status of the SWDIO/TMS DAP hardware I/O pin.
 */
 __STATIC_FORCEINLINE uint32_t PIN_SWDIO_TMS_IN  (void) {
-  return HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_SWDIO_TMS);
+  //return HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_SWDIO_TMS);
+	return (GPIOA->IDR & GPIO_PIN_SWDIO_TMS) >> GPIO_PIN_SWDIO_TMS_BIT; 
 }
 
 /** SWDIO/TMS I/O pin: Set Output to High.
 Set the SWDIO/TMS DAP hardware I/O pin to high level.
 */
 __STATIC_FORCEINLINE void     PIN_SWDIO_TMS_SET (void) {
-  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_SWDIO_TMS, GPIO_PIN_SET);
+  //HAL_GPIO_WritePin(GPIOA, GPIO_PIN_SWDIO_TMS, GPIO_PIN_SET);
+	GPIOA->BSRR = (uint32_t)GPIO_PIN_SWDIO_TMS;
 }
 
 /** SWDIO/TMS I/O pin: Set Output to Low.
 Set the SWDIO/TMS DAP hardware I/O pin to low level.
 */
 __STATIC_FORCEINLINE void     PIN_SWDIO_TMS_CLR (void) {
-  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_SWDIO_TMS, GPIO_PIN_RESET);
+  //HAL_GPIO_WritePin(GPIOA, GPIO_PIN_SWDIO_TMS, GPIO_PIN_RESET);
+	GPIOA->BRR = (uint32_t)GPIO_PIN_SWDIO_TMS;
 }
 
 /** SWDIO I/O pin: Get Input (used in SWD mode only).
 \return Current status of the SWDIO DAP hardware I/O pin.
 */
 __STATIC_FORCEINLINE uint32_t PIN_SWDIO_IN      (void) {
-  return HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_SWDIO_TMS);
+  //return HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_SWDIO_TMS);
+	return (GPIOA->IDR & GPIO_PIN_SWDIO_TMS) >> GPIO_PIN_SWDIO_TMS_BIT;
 }
 
 /** SWDIO I/O pin: Set Output (used in SWD mode only).
 \param bit Output value for the SWDIO DAP hardware I/O pin.
 */
 __STATIC_FORCEINLINE void     PIN_SWDIO_OUT     (uint32_t bit) {
-  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_SWDIO_TMS, bit & 0x1);
+  //HAL_GPIO_WritePin(GPIOA, GPIO_PIN_SWDIO_TMS, bit & 0x1);
+	GPIOA->BSRR = (bit & 1) ? 1UL << GPIO_PIN_SWDIO_TMS_BIT : 1UL << (GPIO_PIN_SWDIO_TMS_BIT+16);
 }
 
 /** SWDIO I/O pin: Switch to Output mode (used in SWD mode only).
@@ -421,14 +441,16 @@ __STATIC_FORCEINLINE void     PIN_SWDIO_OUT_DISABLE (void) {
 \return Current status of the TDI DAP hardware I/O pin.
 */
 __STATIC_FORCEINLINE uint32_t PIN_TDI_IN  (void) {
-  return HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_TDI);
+  //return HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_TDI);
+	return (GPIOA->IDR & GPIO_PIN_TDI) >> GPIO_PIN_TDI_BIT;
 }
 
 /** TDI I/O pin: Set Output.
 \param bit Output value for the TDI DAP hardware I/O pin.
 */
 __STATIC_FORCEINLINE void     PIN_TDI_OUT (uint32_t bit) {
-  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_TDI, bit & 0x1);
+  //HAL_GPIO_WritePin(GPIOA, GPIO_PIN_TDI, bit & 0x1);
+	GPIOA->BSRR = (bit & 1) ? 1UL << GPIO_PIN_TDI_BIT : 1UL << (GPIO_PIN_TDI_BIT+16);
 }
 
 
@@ -438,7 +460,8 @@ __STATIC_FORCEINLINE void     PIN_TDI_OUT (uint32_t bit) {
 \return Current status of the TDO DAP hardware I/O pin.
 */
 __STATIC_FORCEINLINE uint32_t PIN_TDO_IN  (void) {
-  return HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_TDO);
+  //return HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_TDO);
+	return (GPIOA->IDR & GPIO_PIN_TDO) >> GPIO_PIN_TDO_BIT;
 }
 
 
@@ -466,7 +489,8 @@ __STATIC_FORCEINLINE void     PIN_nTRST_OUT  (uint32_t bit) {
 \return Current status of the nRESET DAP hardware I/O pin.
 */
 __STATIC_FORCEINLINE uint32_t PIN_nRESET_IN  (void) {
-  return HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_nRESET);
+  //return HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_nRESET);
+	return (GPIOA->IDR & GPIO_PIN_nRESET) >> GPIO_PIN_nRESET_BIT;
 }
 
 /** nRESET I/O pin: Set Output.
@@ -475,7 +499,8 @@ __STATIC_FORCEINLINE uint32_t PIN_nRESET_IN  (void) {
            - 1: release device hardware reset.
 */
 __STATIC_FORCEINLINE void     PIN_nRESET_OUT (uint32_t bit) {
-  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_nRESET, bit & 0x1);
+  //HAL_GPIO_WritePin(GPIOA, GPIO_PIN_nRESET, bit & 0x1);
+	GPIOA->BSRR = (bit & 1) ? 1UL << GPIO_PIN_nRESET_BIT : 1UL << (GPIO_PIN_nRESET_BIT+16);
 }
 
 ///@}
