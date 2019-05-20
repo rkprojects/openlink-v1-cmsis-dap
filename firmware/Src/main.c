@@ -39,6 +39,8 @@ extern volatile uint32_t RequestPauseProcessing;
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void Send_USB_DAP_Response(void);
+static void Timer_Init(void);
+
 
 int main(void)
 {
@@ -46,7 +48,8 @@ int main(void)
 	
 	HAL_Init();
 
-  SystemClock_Config();
+  // Set System clock to 48MHz. 
+	SystemClock_Config();
 
   CommonIndex = 0;
 	ResponseIndexSend = 0;
@@ -57,11 +60,14 @@ int main(void)
 	
 	MX_USB_DEVICE_Init();
 	
+	// For DAP time stamp.
+	Timer_Init();
+	
   DAP_Setup();
   
 	while (1) 
 	{
-    /* 
+		/* 
 			Cortex-M0 does not support synchronizing instructions.
 			RequestPendingCount variable has a potential racing condition.
 			Disabling interrupts while update is a choice.
@@ -120,6 +126,72 @@ static void Send_USB_DAP_Response(void) {
 		}
 		ResponsePendingCount--;
 	}
+}
+
+static void Timer_Init(void) {
+	/* Chain TIM1 (prescaler) -> TIM3 (counter) to create 
+		free-running 32bit timer {TIM3, TIM1} with 1us tick.
+	*/
+	
+	// Timer HAL APIs are not used anywhere else.
+	TIM_HandleTypeDef    TimerHandle;
+	TIM_SlaveConfigTypeDef TIM3_SlaveConfig;
+	TIM_MasterConfigTypeDef TIM1_MasterConfig;
+	
+	// Configure TIM3 as slave.
+	memset(&TimerHandle, 0, sizeof(TimerHandle));
+	
+	TimerHandle.Instance = TIM3;
+	TimerHandle.Init.Period            = 0xffff;
+  TimerHandle.Init.Prescaler         = 0;
+  TimerHandle.Init.ClockDivision     = 0;
+  TimerHandle.Init.CounterMode       = TIM_COUNTERMODE_UP;
+  TimerHandle.Init.RepetitionCounter = 0;
+  TimerHandle.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+
+  if (HAL_TIM_Base_Init(&TimerHandle) != HAL_OK) {
+    Error_Handler();
+  }
+	
+	TIM3_SlaveConfig.SlaveMode = TIM_SLAVEMODE_EXTERNAL1;
+	TIM3_SlaveConfig.InputTrigger = TIM_TS_ITR0;
+	TIM3_SlaveConfig.TriggerPolarity = TIM_TRIGGERPOLARITY_RISING; // don't care value
+	TIM3_SlaveConfig.TriggerPrescaler = TIM_TRIGGERPRESCALER_DIV1; // don't care value
+	TIM3_SlaveConfig.TriggerFilter = 0; // don't care value
+	
+	if (HAL_TIM_SlaveConfigSynchronization(&TimerHandle, &TIM3_SlaveConfig) != HAL_OK) {
+		Error_Handler();
+	}
+
+  if (HAL_TIM_Base_Start(&TimerHandle) != HAL_OK) {
+    Error_Handler();
+  }
+	
+	// configure TIM1 as master.
+	memset(&TimerHandle, 0, sizeof(TimerHandle));
+	
+	TimerHandle.Instance = TIM1;
+	TimerHandle.Init.Period            = 0xffff;
+  TimerHandle.Init.Prescaler         = (HAL_RCC_GetHCLKFreq() / TIMESTAMP_CLOCK) - 1;
+  TimerHandle.Init.ClockDivision     = 0;
+  TimerHandle.Init.CounterMode       = TIM_COUNTERMODE_UP;
+  TimerHandle.Init.RepetitionCounter = 0;
+  TimerHandle.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+
+  if (HAL_TIM_Base_Init(&TimerHandle) != HAL_OK) {
+    Error_Handler();
+  }
+	
+	TIM1_MasterConfig.MasterOutputTrigger = TIM_TRGO_UPDATE;
+	TIM1_MasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_ENABLE;
+	
+	if (HAL_TIMEx_MasterConfigSynchronization(&TimerHandle,  &TIM1_MasterConfig) != HAL_OK) {
+		Error_Handler();
+	}
+
+	if (HAL_TIM_Base_Start(&TimerHandle) != HAL_OK) {
+    Error_Handler();
+  }
 }
 
 void SystemClock_Config(void)
