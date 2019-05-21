@@ -73,19 +73,17 @@
   * @{
   */
 
-// VID:PID = 0x1209:0x0001 is for internal testing only.
-// DO NOT use it in production.
-//
+// Unique VID:PID = 1209:2010 alloted by pid.codes, http://pid.codes/1209/2010/
 #define USBD_VID                      0x1209
 #define USBD_LANGID_STRING            0x0409
 #define USBD_MANUFACTURER_STRING      DAP_VENDOR_ID
-#define USBD_PID_FS                   0x0001
+#define USBD_PID_FS                   0x2010
 #define USBD_PRODUCT_STRING_FS        DAP_PRODUCT_ID //Debuggers expect this string to end with "CMSIS-DAP"
 #define USBD_CONFIGURATION_STRING_FS  "Custom HID Config"
 #define USBD_INTERFACE_STRING_FS      "Custom HID Interface"
 
 
-#define OPENLINK_CMSIS_DAP_VERSION		0x0103 //0xMMnn, MM = Major version number, nn = minor version number
+#define OPENLINK_CMSIS_DAP_VERSION		0x0104 //0xMMnn, MM = Major version number, nn = minor version number
 
 /* USER CODE BEGIN PRIVATE_DEFINES */
 

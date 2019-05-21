@@ -89,8 +89,6 @@ board refer to [project home page](https://ravikiranb.com/projects/cmsis-dap-deb
 * JTAG interface of the debug unit is not yet tested as 
 all the Cortex-M boards I have are designed with SWD debug port. 
 However JTAG interface is completely implemented in firmware.
-* Currently a test USB VID/PID: [1209/0001](http://pid.codes) is assigned which is meant
-for only private testing. Unique USB VID/PID assignment is pending.
 * Current 10-pin debug connector (J4) is of through hole type with 1.27mm pitch. Commonly
 used connectors are of SMD type compatible with samtec FTSH-105- styles.
 
